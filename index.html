@@ -663,13 +663,11 @@ async function submitForm(){
 
   showLoading("Google Sheets에 저장 중...");
   try {
-    await fetch(SCRIPT_URL, {
-      method:"POST",
-      headers:{"Content-Type":"text/plain"},
-      body:JSON.stringify(sub),
-      mode:"no-cors",   // Apps Script CORS 우회
-    });
-  } catch(e) { /* no-cors는 항상 opaque — 무시 */ }
+    const url = SCRIPT_URL + "?action=submit&data=" + encodeURIComponent(JSON.stringify(sub));
+    await fetch(url, { mode:"no-cors" });
+  } catch(e) { /* no-cors opaque — 무시 */ }
+  // 1초 대기 후 완료 (Apps Script 처리 시간 확보)
+  await new Promise(r => setTimeout(r, 1000));
   hideLoading();
 
   document.getElementById("p-step2-wrap").style.display="none";
